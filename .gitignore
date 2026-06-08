@@ -1,0 +1,8 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+artifacts/
+latest-account.json
+online-registered-accounts.json
