@@ -213,8 +213,9 @@ async def run_full_checks(notify_feishu: bool = True, debug_recipient_email: str
         await run_safely(
             {
                 "label": "老用户登录",
-                "mode": "existing-account",
-                "useExistingAccount": True,
+                "mode": "password-login",
+                "email": __import__("os").getenv("ACCOUNT_EMAIL"),
+                "password": __import__("os").getenv("ACCOUNT_PASSWORD"),
             }
         )
     )
