@@ -111,6 +111,36 @@ def send_feishu_image_key(image_key: str) -> dict[str, Any]:
     return data
 
 
+def send_feishu_image_key_to_member(member_type: str, member_id: str, image_key: str) -> dict[str, Any]:
+    headers = feishu_headers()
+    if not headers:
+        return disabled("missing FEISHU_APP_ID or FEISHU_APP_SECRET")
+    response = requests.post(
+        f"{BASE_URL}/im/v1/messages",
+        params={"receive_id_type": member_type},
+        headers={**headers, "Content-Type": "application/json; charset=utf-8"},
+        json={"receive_id": member_id, "msg_type": "image", "content": json.dumps({"image_key": image_key})},
+        timeout=30,
+    )
+    data = response.json()
+    if response.status_code >= 400 or data.get("code") not in (0, None):
+        raise RuntimeError(f"发送飞书图片失败: {response.status_code} {data}")
+    return data
+
+
+def send_feishu_image_to_member(member_type: str, member_id: str, file: str | Path) -> dict[str, Any]:
+    if not APP_ID or not APP_SECRET:
+        return disabled("missing FEISHU_APP_ID or FEISHU_APP_SECRET")
+    path = Path(file)
+    if not path.exists():
+        return disabled(f"image not found: {path}")
+    image_key = upload_feishu_image(path)
+    if isinstance(image_key, dict):
+        return image_key
+    response = send_feishu_image_key_to_member(member_type, member_id, image_key)
+    return {"imageKey": image_key, "response": response}
+
+
 def send_feishu_image(file: str | Path) -> dict[str, Any]:
     if not APP_ID or not APP_SECRET:
         return disabled("missing FEISHU_APP_ID or FEISHU_APP_SECRET")

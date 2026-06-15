@@ -113,6 +113,7 @@ async def run_cli() -> None:
     parser.add_argument("--use-existing-account", action="store_true")
     parser.add_argument("--screenshot")
     parser.add_argument("--no-feishu", action="store_true")
+    parser.add_argument("--debug-recipient-email")
     args = parser.parse_args()
     command = args.command
     if command in ("api", "serve"):
@@ -128,9 +129,9 @@ async def run_cli() -> None:
     elif command == "bitable-summary":
         result = send_bitable_summary_to_collaborators()
     elif command == "daily":
-        result = await run_daily_checks(notify_feishu=not args.no_feishu)
+        result = await run_daily_checks(notify_feishu=not args.no_feishu, debug_recipient_email=args.debug_recipient_email)
     elif command == "full":
-        result = await run_full_checks(notify_feishu=not args.no_feishu)
+        result = await run_full_checks(notify_feishu=not args.no_feishu, debug_recipient_email=args.debug_recipient_email)
     elif command == "subscription":
         result = await run_subscription_check(notify_feishu=not args.no_feishu)
     elif command == "password-login":
